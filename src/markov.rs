@@ -2,8 +2,6 @@ use matrix::Matrix;
 use process::{ Process, ProcessSteps };
 use rand;
 
-pub type MarkovProcess<T: Matrix<f32>> = Process<T>;
-
 pub struct MarkovStep {}
 
 impl<T: Matrix<f32>> ProcessSteps<T> for MarkovStep {

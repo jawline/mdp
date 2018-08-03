@@ -8,26 +8,39 @@ mod greedy;
 use matrix::Matrix;
 use matrix::map::MapMatrix;
 
-use process::{ProcessState, Process};
-use greedy::{ GreedyProcess, GreedyStep };
-use markov::{ MarkovProcess, MarkovStep };
+use process::{ProcessState, ProcessSteps, Process};
+use greedy::{ GreedyStep };
+use markov::{ MarkovStep };
+
+pub fn attempt<T: ProcessSteps<MapMatrix<f32>>>(process: &Process<MapMatrix<f32>>, step: &T) {
+	
+	let mut state = ProcessState {
+		node: 0,
+		reward: 0.0
+	};
+
+	let mut rounds = 0;
+
+
+	while process::step_process(&mut state, process, step) {
+		rounds += 1;
+	}
+
+	if state.node == 3 {
+		println!("Goal reached in {} steps", rounds);
+	}
+
+}
 
 fn main() {
 
 	let num_states = 10;
 
-	let mut process = GreedyProcess {
+	let mut process = Process {
 		states: num_states,
 		transition: MapMatrix::<f32>::new(0.0, num_states, num_states),
 		reward: MapMatrix::<f32>::new(0.0, num_states, num_states),
 		discount: 0.0
-	};
-
-	let mut step = GreedyStep{};
-
-	let mut state = ProcessState {
-		node: 0,
-		reward: 0.0
 	};
 
 	//0 can go to 1
@@ -52,9 +65,6 @@ fn main() {
 	println!("Reward Matrix");
 	matrix::print_matrix(&process.reward);
 
-	while process::step_process(&mut state, &process, &step) {}
-
-	if state.node == 3 {
-		println!("Goal transition node!");
-	}
+	attempt(&process, &GreedyStep{});
+	attempt(&process, &MarkovStep{});
 }

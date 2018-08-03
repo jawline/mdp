@@ -2,7 +2,6 @@ use matrix::Matrix;
 use process::{ Process, ProcessSteps };
 use rand;
 
-pub type GreedyProcess<T: Matrix<f32>> = Process<T>;
 pub struct GreedyStep {}
 
 impl<T: Matrix<f32>> ProcessSteps<T> for GreedyStep {
