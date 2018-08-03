@@ -36,6 +36,4 @@ fn main() {
 
 	println!("Reward Matrix");
 	matrix::print_matrix(&process.reward);
-
-	//let mut reward = Vec::new();
 }
