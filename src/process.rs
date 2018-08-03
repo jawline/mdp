@@ -35,10 +35,14 @@ pub fn step_process<T: Matrix<f32>, R: ProcessSteps<T>>(state: &mut ProcessState
 		println!("{}, {}", state, probability);
 	}
 
-	if let Some(node) = step.select_transfer(&transition_list) {
-		state.current_state = node;
-		true
-	} else {
-		false
+	loop {
+		if let Some(node) = step.select_transfer(&transition_list) {
+			if step.try_transfer(&process, state.current_state, node) {
+				state.current_state = node;
+				return true;
+			}
+		} else {
+			return false;
+		}
 	}
 }

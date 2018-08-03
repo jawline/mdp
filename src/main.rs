@@ -1,3 +1,5 @@
+extern crate rand;
+
 mod matrix;
 mod process;
 mod chain;
