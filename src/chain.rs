@@ -17,15 +17,27 @@ impl<T: Matrix<f32>> ProcessSteps<T> for MarkovStep {
 
 	fn select_transfer(&self, possible: &Vec<(usize, f32)>) -> Option<usize> {
 		if possible.len() != 0 {
-			let random_choice = rand::random::<f64>();
 
-			for (node, probability) in possible {
-				//TODO
+			let mut random_choice = rand::random::<f32>();
+
+			for &(node, probability) in possible {
+				
+				if random_choice <= probability {
+					return Some(node);
+				}
+
+				random_choice -= probability;
 			}
 
 			None
 		} else {
 			None
 		}
+	}
+
+	fn select_reward(&self, process: &Process<T>, from: usize, to: usize, success: bool) -> f32 {
+		process.reward
+			.get(from, to)
+			.unwrap_or_else(|| 0.0)
 	}
 }

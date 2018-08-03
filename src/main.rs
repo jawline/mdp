@@ -24,22 +24,23 @@ fn main() {
 	let mut step = MarkovStep {};
 
 	let mut state = ProcessState {
-		current_state: 0
+		node: 0,
+		reward: 0.0
 	};
 
 	//0 can go to 1
-	process.transition.set(0, 1, 1.0);
+	process.transition.set(0, 1, 0.75);
 
 	//0 can go to 2
-	process.transition.set(0, 2, 0.5);
+	process.transition.set(0, 2, 0.25);
 	
 	//1 and 2 can go to 0
 	process.transition.set(1, 0, 1.0);
 	process.transition.set(2, 0, 1.0);
 
 	//Reward highly for going through 1, and poorly for going through 0
-	process.reward.set(0, 1, 5.0);
-	process.reward.set(0, 2, 1.0);
+	process.reward.set(0, 1, -1.0);
+	process.reward.set(0, 2, 5.0);
 
 	println!("Transition Matrix");
 	matrix::print_matrix(&process.transition);
