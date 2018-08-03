@@ -2,11 +2,10 @@ use matrix::Matrix;
 use process::{ Process, ProcessSteps };
 use rand;
 
-pub type MarkovProcess<T: Matrix<f32>> = Process<T>;
+pub type GreedyProcess<T: Matrix<f32>> = Process<T>;
+pub struct GreedyStep {}
 
-pub struct MarkovStep {}
-
-impl<T: Matrix<f32>> ProcessSteps<T> for MarkovStep {
+impl<T: Matrix<f32>> ProcessSteps<T> for GreedyStep {
 	
 	fn try_transfer(&self, process: &Process<T>, from: usize, to: usize) -> bool {
 		match process.transition.get(from, to) {
@@ -15,21 +14,12 @@ impl<T: Matrix<f32>> ProcessSteps<T> for MarkovStep {
 		}
 	}
 
-	fn select_transfer(&self, possible: &Vec<(usize, f32)>) -> Option<usize> {
+	fn select_transfer(&self, possible: &Vec<(usize, f32, f32)>) -> Option<usize> {
 		if possible.len() != 0 {
-
-			let mut random_choice = rand::random::<f32>();
-
-			for &(node, probability) in possible {
-				
-				if random_choice <= probability {
-					return Some(node);
-				}
-
-				random_choice -= probability;
+			match possible.iter().max_by(|(_, _, reward1), (_, _, reward2)| reward1.partial_cmp(reward2).unwrap()) {
+				Some(&(node, _, _)) => Some(node),
+				None => None
 			}
-
-			None
 		} else {
 			None
 		}

@@ -8,7 +8,7 @@ pub struct Process<T: Matrix<f32>> {
 }
 
 pub trait ProcessSteps<T: Matrix<f32>> {
-	fn select_transfer(&self, possible: &Vec<(usize, f32)>) -> Option<usize>;
+	fn select_transfer(&self, possible: &Vec<(usize, f32, f32)>) -> Option<usize>;
 	fn try_transfer(&self, process: &Process<T>, from: usize, to: usize) -> bool;
 	fn select_reward(&self, process: &Process<T>, from: usize, to: usize, success: bool) -> f32;
 }
@@ -26,16 +26,16 @@ pub fn step_process<T: Matrix<f32>, R: ProcessSteps<T>>(state: &mut ProcessState
 		let probability = process.transition.get(state.node, i).unwrap();
 
 		if probability != 0.0 {
-			transition_list.push((i, probability));
+			transition_list.push((i, probability, process.reward.get(state.node, i).unwrap()));
 		}
 	}
 
 	println!("Current State: {}", state.node);
-	println!("Curren Reward: {}", state.reward);
+	println!("Current Reward: {}", state.reward);
 	println!("Possible Transitions: ");
 
-	for (state, probability) in &transition_list {
-		println!("{}, {}", state, probability);
+	for (state, probability, reward) in &transition_list {
+		println!("{}, {}, {}", state, probability, reward);
 	}
 
 	loop {
