@@ -1,20 +1,28 @@
 mod matrix;
 mod process;
+mod chain;
 
 use matrix::Matrix;
 use matrix::map::MapMatrix;
 
-use process::Process;
+use process::{ProcessState, Process};
+use chain::{ MarkovProcess, MarkovStep };
 
 fn main() {
 
 	let num_states = 10;
 
-	let mut process = Process {
+	let mut process = MarkovProcess {
 		states: num_states,
 		transition: MapMatrix::<f32>::new(0.0, num_states, num_states),
 		reward: MapMatrix::<f32>::new(0.0, num_states, num_states),
 		discount: 0.0
+	};
+
+	let mut step = MarkovStep {};
+
+	let mut state = ProcessState {
+		current_state: 0
 	};
 
 	//0 can go to 1
@@ -36,4 +44,6 @@ fn main() {
 
 	println!("Reward Matrix");
 	matrix::print_matrix(&process.reward);
+
+	while process::step_process(&mut state, &process, &step) {}
 }
