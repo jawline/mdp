@@ -31,12 +31,16 @@ pub fn step_process<T: Matrix<f32>, R: Agent<T>>(state: &mut ProcessState, proce
 		}
 	}
 
-	println!("Current State: {}", state.node);
-	println!("Current Reward: {}", state.reward);
-	println!("Possible Transitions: ");
+	if cfg!(debug_assertions) {
+	
+		println!("Current State: {}", state.node);
+		println!("Current Reward: {}", state.reward);
+		println!("Possible Transitions: ");
 
-	for (state, probability, reward) in &transition_list {
-		println!("{}, {}, {}", state, probability, reward);
+		for (state, probability, reward) in &transition_list {
+			println!("{}, {}, {}", state, probability, reward);
+		}
+
 	}
 
 	loop {
@@ -47,7 +51,11 @@ pub fn step_process<T: Matrix<f32>, R: Agent<T>>(state: &mut ProcessState, proce
 			state.reward += reward;
 			
 			if transferred {
-				println!("Transferred to: {}", node);
+				
+				if cfg!(debug_assertions) {
+					println!("Transferred to: {}", node);
+				}
+
 				state.node = node;
 				return true;
 			}

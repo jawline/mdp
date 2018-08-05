@@ -5,3 +5,7 @@ authors = ["blake <blake@parsed.uk>"]
 
 [dependencies]
 rand = "0.5"
+
+[features]
+default = []
+verbose = []

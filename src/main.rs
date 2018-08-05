@@ -14,7 +14,7 @@ use greedy::{ GreedyAgent };
 use markov::{ MarkovChainAgent };
 use reinforcement::{ ReinforcementAgent };
 
-pub fn attempt<T: Agent<MapMatrix<f32>>>(process: &Process<MapMatrix<f32>>, step: &mut T) {
+pub fn attempt<T: Agent<MapMatrix<f32>>>(process: &Process<MapMatrix<f32>>, step: &mut T) -> (usize, f32) {
 	
 	let mut state = ProcessState {
 		node: 0,
@@ -27,21 +27,21 @@ pub fn attempt<T: Agent<MapMatrix<f32>>>(process: &Process<MapMatrix<f32>>, step
 		rounds += 1;
 	}
 
-	if state.node == 3 {
-		println!("Goal reached in {} steps", rounds);
-	} else {
-		println!("Goal not reached (stuck) in {} steps", rounds);
-	}
-
+	(rounds, state.reward)
 }
 
 fn train_naive(process: &Process<MapMatrix<f32>>, num_states: usize) {
 	let mut agent = ReinforcementAgent{ learned_reward: MapMatrix::<f32>::new(0.0, num_states, num_states) };
 
-	for _ in 0..500 {
+	let (first_run, reward_fr) = attempt(&process, &mut agent);
+
+	for _ in 0..5 {
 		attempt(&process, &mut agent);
 	}
 
+	let (last_run, reward_lr) = attempt(&process, &mut agent);
+
+	println!("First vs Last {}, {} : {}, {}", first_run, reward_fr, last_run, reward_lr);
 }
 
 fn main() {
@@ -69,7 +69,13 @@ fn main() {
 
 	//Reward highly for going through 1, and poorly for going through 0
 	process.reward.set(0, 1, -1.0);
-	process.reward.set(0, 2, 0.0);
+	process.reward.set(0, 2, -5.0);
+
+	process.reward.set(1, 0, -10.0);
+
+	process.reward.set(2, 0, 0.5);
+	process.reward.set(2, 1, 1.0);
+	process.reward.set(2, 3, 3.0);
 
 	println!("Transition Matrix");
 	matrix::print_matrix(&process.transition);
@@ -77,8 +83,8 @@ fn main() {
 	println!("Reward Matrix");
 	matrix::print_matrix(&process.reward);
 
-	attempt(&process, &mut GreedyAgent{});
-	attempt(&process, &mut MarkovChainAgent{});
+	//attempt(&process, &mut GreedyAgent{});
+	//attempt(&process, &mut MarkovChainAgent{});
 
 	train_naive(&process, num_states);
 }
