@@ -4,15 +4,17 @@ mod matrix;
 mod process;
 mod markov;
 mod greedy;
+mod reinforcement;
 
 use matrix::Matrix;
 use matrix::map::MapMatrix;
 
-use process::{ProcessState, ProcessSteps, Process};
-use greedy::{ GreedyStep };
-use markov::{ MarkovStep };
+use process::{ProcessState, Agent, Process};
+use greedy::{ GreedyAgent };
+use markov::{ MarkovChainAgent };
+use reinforcement::{ ReinforcementAgent };
 
-pub fn attempt<T: ProcessSteps<MapMatrix<f32>>>(process: &Process<MapMatrix<f32>>, step: &T) {
+pub fn attempt<T: Agent<MapMatrix<f32>>>(process: &Process<MapMatrix<f32>>, step: &mut T) {
 	
 	let mut state = ProcessState {
 		node: 0,
@@ -21,13 +23,23 @@ pub fn attempt<T: ProcessSteps<MapMatrix<f32>>>(process: &Process<MapMatrix<f32>
 
 	let mut rounds = 0;
 
-
 	while process::step_process(&mut state, process, step) {
 		rounds += 1;
 	}
 
 	if state.node == 3 {
 		println!("Goal reached in {} steps", rounds);
+	} else {
+		println!("Goal not reached (stuck) in {} steps", rounds);
+	}
+
+}
+
+fn train_naive(process: &Process<MapMatrix<f32>>, num_states: usize) {
+	let mut agent = ReinforcementAgent{ learned_reward: MapMatrix::<f32>::new(0.0, num_states, num_states) };
+
+	for _ in 0..500 {
+		attempt(&process, &mut agent);
 	}
 
 }
@@ -65,6 +77,8 @@ fn main() {
 	println!("Reward Matrix");
 	matrix::print_matrix(&process.reward);
 
-	attempt(&process, &GreedyStep{});
-	attempt(&process, &MarkovStep{});
+	attempt(&process, &mut GreedyAgent{});
+	attempt(&process, &mut MarkovChainAgent{});
+
+	train_naive(&process, num_states);
 }

@@ -7,10 +7,11 @@ pub struct Process<T: Matrix<f32>> {
 	pub discount: f32
 }
 
-pub trait ProcessSteps<T: Matrix<f32>> {
-	fn select_transfer(&self, possible: &Vec<(usize, f32, f32)>) -> Option<usize>;
+pub trait Agent<T: Matrix<f32>> {
+	fn select_transfer(&self, from: usize, possible: &Vec<(usize, f32, f32)>) -> Option<usize>;
 	fn try_transfer(&self, process: &Process<T>, from: usize, to: usize) -> bool;
 	fn select_reward(&self, process: &Process<T>, from: usize, to: usize, success: bool) -> f32;
+	fn punish_action(&mut self, process: &Process<T>, from: usize, to: usize, reward: f32, success: bool);
 }
 
 pub struct ProcessState {
@@ -18,7 +19,7 @@ pub struct ProcessState {
 	pub reward: f32
 }
 
-pub fn step_process<T: Matrix<f32>, R: ProcessSteps<T>>(state: &mut ProcessState, process: &Process<T>, step: &R) -> bool {
+pub fn step_process<T: Matrix<f32>, R: Agent<T>>(state: &mut ProcessState, process: &Process<T>, step: &mut R) -> bool {
 
 	let mut transition_list = Vec::new();
 
@@ -39,9 +40,11 @@ pub fn step_process<T: Matrix<f32>, R: ProcessSteps<T>>(state: &mut ProcessState
 	}
 
 	loop {
-		if let Some(node) = step.select_transfer(&transition_list) {
+		if let Some(node) = step.select_transfer(state.node, &transition_list) {
 			let transferred = step.try_transfer(&process, state.node, node);
-			state.reward += step.select_reward(&process, state.node, node, transferred);
+			let reward = step.select_reward(&process, state.node, node, transferred);
+			step.punish_action(&process, state.node, node, reward, transferred);
+			state.reward += reward;
 			
 			if transferred {
 				println!("Transferred to: {}", node);

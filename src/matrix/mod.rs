@@ -18,3 +18,6 @@ pub fn print_matrix<T: Copy + Display>(mat: &Matrix<T>) {
 		print!("\n");
 	}
 }
+
+pub use self::map::MapMatrix;
+pub use self::dense::DenseMatrix;

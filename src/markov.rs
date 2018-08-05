@@ -1,10 +1,10 @@
 use matrix::Matrix;
-use process::{ Process, ProcessSteps };
+use process::{ Process, Agent };
 use rand;
 
-pub struct MarkovStep {}
+pub struct MarkovChainAgent {}
 
-impl<T: Matrix<f32>> ProcessSteps<T> for MarkovStep {
+impl<T: Matrix<f32>> Agent<T> for MarkovChainAgent {
 	
 	fn try_transfer(&self, process: &Process<T>, from: usize, to: usize) -> bool {
 		match process.transition.get(from, to) {
@@ -13,7 +13,7 @@ impl<T: Matrix<f32>> ProcessSteps<T> for MarkovStep {
 		}
 	}
 
-	fn select_transfer(&self, possible: &Vec<(usize, f32, f32)>) -> Option<usize> {
+	fn select_transfer(&self, from: usize, possible: &Vec<(usize, f32, f32)>) -> Option<usize> {
 		if possible.len() != 0 {
 
 			let mut random_choice = rand::random::<f32>();
@@ -38,4 +38,6 @@ impl<T: Matrix<f32>> ProcessSteps<T> for MarkovStep {
 			.get(from, to)
 			.unwrap_or_else(|| 0.0)
 	}
+
+	fn punish_action(&mut self, process: &Process<T>, from: usize, to: usize, reward: f32, success: bool) {}
 }
