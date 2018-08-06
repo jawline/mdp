@@ -1,5 +1,5 @@
 use matrix::Matrix;
-use process::{ Process, Agent };
+use process::{ Process, Agent, State };
 use rand;
 
 pub struct MarkovChainAgent {}
@@ -39,5 +39,5 @@ impl<T: Matrix<f32>> Agent<T> for MarkovChainAgent {
 			.unwrap_or_else(|| 0.0)
 	}
 
-	fn punish_action(&mut self, process: &Process<T>, from: usize, to: usize, reward: f32, success: bool) {}
+	fn punish_action(&mut self, process: &Process<T>, state: &State, from: usize, to: usize, reward: f32, success: bool) {}
 }

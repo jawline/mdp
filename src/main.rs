@@ -9,14 +9,14 @@ mod reinforcement;
 use matrix::Matrix;
 use matrix::map::MapMatrix;
 
-use process::{ProcessState, Agent, Process};
+use process::{State, Agent, Process};
 use greedy::{ GreedyAgent };
 use markov::{ MarkovChainAgent };
 use reinforcement::{ ReinforcementAgent };
 
 pub fn attempt<T: Agent<MapMatrix<f32>>>(process: &Process<MapMatrix<f32>>, step: &mut T) -> (usize, f32) {
 	
-	let mut state = ProcessState {
+	let mut state = State {
 		node: 0,
 		reward: 0.0
 	};

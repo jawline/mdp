@@ -1,5 +1,5 @@
 use matrix::{ Matrix, MapMatrix };
-use process::{ Process, Agent };
+use process::{ Process, State, Agent };
 use rand::{ thread_rng, Rng };
 
 pub struct ReinforcementAgent {
@@ -59,15 +59,22 @@ impl<T: Matrix<f32>> Agent<T> for ReinforcementAgent {
 		process.reward.get(from, to).unwrap_or_else(|| 0.0)
 	}
 
-	fn punish_action(&mut self, process: &Process<T>, from: usize, to: usize, reward: f32, success: bool) {
+	fn punish_action(&mut self, process: &Process<T>, state: &State, from: usize, to: usize, reward: f32, success: bool) {
 		println!("Punished {} {} {}", from, to, reward);
+		
 		let old = self
 			.learned_reward
 			.get(from, to)
 			.unwrap();
+
+		let new = state.reward + reward;
 		
-		self
-			.learned_reward
-			.set(from, to, old + reward);
+		if old != 0.0 && old >= new {
+			self
+				.learned_reward
+				.set(from, to, 0.0);
+		} else {
+			self.learned_reward.set(from, to, new);
+		}
 	}
 }
