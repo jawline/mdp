@@ -2,17 +2,15 @@ extern crate rand;
 
 mod matrix;
 mod process;
-mod markov;
-mod greedy;
-mod reinforcement;
+mod strategies;
 
 use matrix::Matrix;
 use matrix::map::MapMatrix;
 
 use process::{State, Agent, Process};
-use greedy::{ GreedyAgent };
-use markov::{ MarkovChainAgent };
-use reinforcement::{ ReinforcementAgent };
+use strategies::greedy::{ GreedyAgent };
+use strategies::markov::{ MarkovChainAgent };
+use strategies::reinforcement::naive::{ ReinforcementAgent };
 
 pub fn attempt<T: Agent<MapMatrix<f32>>>(process: &Process<MapMatrix<f32>>, step: &mut T) -> (usize, f32) {
 	
